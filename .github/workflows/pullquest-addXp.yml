@@ -6,8 +6,7 @@ on:
 
 jobs:
   handle-bonus-xp:
-    # Only run on pull request comments
-    if: github.event.issue.pull_request
+    # Run on both issue and PR comments
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -43,7 +42,8 @@ jobs:
     - name: Debug – print extracted info
       if: steps.check-comment.outputs.trigger_action == 'true'
       run: |
-        echo "🔍 PR #        : ${{ github.event.issue.number }}"
+        echo "🔍 Issue/PR #  : ${{ github.event.issue.number }}"
+        echo "🔍 Is PR?      : ${{ github.event.issue.pull_request != null }}"
         echo "🔍 Requester   : ${{ github.event.comment.user.login }}"
         echo "🔍 XP Amount   : ${{ steps.check-comment.outputs.xp_amount }}"
         echo "🔍 Target User : ${{ steps.check-comment.outputs.username }}"
@@ -52,10 +52,11 @@ jobs:
     - name: Build payload ➜ POST to backend
       if: steps.check-comment.outputs.trigger_action == 'true'
       run: |
-        PR_NUMBER=${{ github.event.issue.number }}
+        ISSUE_NUMBER=${{ github.event.issue.number }}
         REQUESTER="${{ github.event.comment.user.login }}"
         XP_AMOUNT=${{ steps.check-comment.outputs.xp_amount }}
         TARGET_USERNAME="${{ steps.check-comment.outputs.username }}"
+        IS_PR="${{ github.event.issue.pull_request != null }}"
         
         # Assemble payload for bonus XP
         payload=$(jq -n \
@@ -63,12 +64,14 @@ jobs:
           --arg repo          "${{ github.event.repository.name }}" \
           --arg requester     "$REQUESTER" \
           --arg targetUser    "$TARGET_USERNAME" \
-          --argjson prNumber  "$PR_NUMBER" \
+          --arg isPR          "$IS_PR" \
+          --argjson issueNumber  "$ISSUE_NUMBER" \
           --argjson xpAmount  "$XP_AMOUNT" \
           '{
             owner: $owner,
             repo: $repo, 
-            prNumber: $prNumber,
+            issueNumber: $issueNumber,
+            isPullRequest: ($isPR == "true"),
             requester: $requester,
             targetUser: $targetUser,
             xpAmount: $xpAmount
