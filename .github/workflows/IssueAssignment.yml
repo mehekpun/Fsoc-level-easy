@@ -1,0 +1,47 @@
+name: Check User Assignments on PR Open
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  check-assignments:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if PR has assignees
+        id: check_assignees
+        run: |
+          echo "Checking PR assignees..."
+        
+      - name: Get assignee username
+        id: get_assignee
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const assignees = pr.assignees || [];
+            
+            if (assignees.length > 0) {
+              const assignee = assignees[0].login; // Get first assignee
+              core.setOutput('username', assignee);
+              core.setOutput('has_assignee', 'true');
+              console.log(`Found assignee: ${assignee}`);
+            } else {
+              // If no assignee, use PR author
+              const author = pr.user.login;
+              core.setOutput('username', author);
+              core.setOutput('has_assignee', 'true');
+              console.log(`No assignee found, using PR author: ${author}`);
+            }
+      
+      - name: Call Assignment API
+        if: steps.get_assignee.outputs.has_assignee == 'true'
+        run: |
+          curl -X POST ${{ secrets.API_BASE_URL }}/api/hactoberfest/IssueAssigned \
+            -H "Content-Type: application/json" \
+            -d '{
+              "owner": "${{ github.repository_owner }}",
+              "repo": "${{ github.event.repository.name }}",
+              "issueNumber": ${{ github.event.pull_request.number }},
+              "assignedUser": "${{ steps.get_assignee.outputs.username }}"
+            }'
