@@ -183,9 +183,96 @@ body {
 }
 
   footer {
+    
     background: #222;
     color: white;
     padding: 1rem;
     margin-top: 2rem;
+    
   }
   
+  footer a{
+    color: rgba(220, 219, 219, 0.595);
+    text-decoration: none;
+  }
+
+  footer a:hover{
+color: white;
+  }
+
+  .linkToFest{
+    margin-left:12px ;
+    font-size: 18px;
+    color: #ccc;
+    text-align: left; 
+  }
+
+  .linkToFest span{
+    font-size: 20px;
+  }
+  
+  .linkToFest span a{
+    color: #b0a0c8e9;
+  }
+
+  .linkToFest span a:hover{
+    color:#6550e8f4;
+  }
+
+  .footerMiddle{
+    display: flex;
+  }
+
+  .linkToSocials{
+    width: 300px;
+    text-align: left;
+
+  }
+
+  .linkToSocials > p{
+    
+    padding-left: 12px;
+    color: #ccc;
+  }
+
+  .linkToSocials ul{
+    margin: 8px 0;
+    padding-left: 10px;
+    list-style-type: none;
+  }
+
+  .linkToSocials ul li{
+    padding: 2px;
+  }
+
+  .contactUs{
+    width: 300px;
+    text-align: left;
+  }
+
+  .contactUs > p{
+    padding-left: 12px;
+    color: #ccc;
+  }
+
+  .contactUs ul{
+    padding-left: 10px;
+    margin: 8px 0;
+    list-style-type: none;
+  }
+
+  .contactUs ul li{
+    padding:2px;
+    color: rgba(220, 219, 219, 0.595);
+  }
+
+  @media screen and (max-width: 600px) {
+
+  footer {
+    margin-bottom: 50px;
+  }
+  .footerMiddle{
+    flex-direction: column;
+  }
+
+}
