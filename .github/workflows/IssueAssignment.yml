@@ -7,41 +7,67 @@ on:
 jobs:
   check-assignments:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    env:
+      BACKEND_URL: https://pullquestgithubbackend-1.onrender.com
+    
     steps:
-      - name: Check if PR has assignees
-        id: check_assignees
-        run: |
-          echo "Checking PR assignees..."
+    - name: Get PR assignee or author
+      id: get_user
+      run: |
+        # Check if PR has assignees
+        assignees='${{ toJson(github.event.pull_request.assignees) }}'
+        pr_author="${{ github.event.pull_request.user.login }}"
         
-      - name: Get assignee username
-        id: get_assignee
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const pr = context.payload.pull_request;
-            const assignees = pr.assignees || [];
-            
-            if (assignees.length > 0) {
-              const assignee = assignees[0].login; // Get first assignee
-              core.setOutput('username', assignee);
-              core.setOutput('has_assignee', 'true');
-              console.log(`Found assignee: ${assignee}`);
-            } else {
-              // If no assignee, use PR author
-              const author = pr.user.login;
-              core.setOutput('username', author);
-              core.setOutput('has_assignee', 'true');
-              console.log(`No assignee found, using PR author: ${author}`);
-            }
-      
-      - name: Call Assignment API
-        if: steps.get_assignee.outputs.has_assignee == 'true'
-        run: |
-          curl -X POST ${{ secrets.API_BASE_URL }}/api/hactoberfest/IssueAssigned \
-            -H "Content-Type: application/json" \
-            -d '{
-              "owner": "${{ github.repository_owner }}",
-              "repo": "${{ github.event.repository.name }}",
-              "issueNumber": ${{ github.event.pull_request.number }},
-              "assignedUser": "${{ steps.get_assignee.outputs.username }}"
-            }'
+        if [[ "$assignees" != "[]" ]]; then
+          # Extract first assignee username
+          username=$(echo "$assignees" | jq -r '.[0].login')
+          echo "username=$username" >> $GITHUB_OUTPUT
+          echo "✅ Found assignee: $username"
+        else
+          # Use PR author if no assignee
+          echo "username=$pr_author" >> $GITHUB_OUTPUT
+          echo "✅ No assignee found, using PR author: $pr_author"
+        fi
+    
+    - name: Debug – print extracted info
+      run: |
+        echo "🔍 PR Number   : ${{ github.event.pull_request.number }}"
+        echo "🔍 Username    : ${{ steps.get_user.outputs.username }}"
+        echo "🔍 Repository  : ${{ github.event.repository.full_name }}"
+        echo "🔍 Owner       : ${{ github.event.repository.owner.login }}"
+        echo "🔍 Repo Name   : ${{ github.event.repository.name }}"
+    
+    - name: Build payload ➜ POST to backend
+      run: |
+        PR_NUMBER=${{ github.event.pull_request.number }}
+        USERNAME="${{ steps.get_user.outputs.username }}"
+        
+        # Assemble payload for assignment check
+        payload=$(jq -n \
+          --arg owner         "${{ github.event.repository.owner.login }}" \
+          --arg repo          "${{ github.event.repository.name }}" \
+          --arg assignedUser  "$USERNAME" \
+          --argjson issueNumber  "$PR_NUMBER" \
+          '{
+            owner: $owner,
+            repo: $repo, 
+            issueNumber: $issueNumber,
+            assignedUser: $assignedUser
+          }')
+        
+        echo "📦 Payload:"
+        echo "$payload"
+        
+        response=$(curl --fail --show-error --silent \
+          -X POST "$BACKEND_URL/api/hactoberfest/IssueAssigned" \
+          -H "Content-Type: application/json" \
+          --data-raw "$payload" \
+          -w '\nHTTP %{http_code}\n' )
+        
+        echo "🔍 Response: $response"
+    
+    - name: Done
+      run: echo "✅ Assignment check completed and comment posted to PR"
