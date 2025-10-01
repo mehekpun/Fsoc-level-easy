@@ -6,7 +6,115 @@ body {
     background: #f5f7fa;
     color: #333;
   }
-  
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  padding: 0.75rem 2rem;
+  box-shadow: 0 2px 8px rgba(98,0,234,0.07);
+  position: relative;
+  font-size: 1.1rem;
+}
+
+.mysite {
+  font-weight: bold;
+  color: #6200ea;
+  font-size: 1.4rem;
+  letter-spacing: 1px;
+  cursor:pointer;
+}
+
+.mysite:hover{
+  color:#d213c2;
+}
+.nav_links {
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
+}
+
+.nav_links li a {
+  text-decoration: none;
+  color: #333;
+  padding: 0.5rem 1rem;
+  border-radius: 24px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.nav_links li a:hover,
+.nav_links li a:focus {
+  background: #6200ea;
+  color: #fff;
+}
+
+.nav_toggle {
+  display: none;
+}
+
+.nav_icon {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  width: 32px;
+  height: 28px;
+  justify-content: center;
+  gap: 5px;
+}
+
+.nav_icon span {
+  display: block;
+  height: 4px;
+  width: 100%;
+  background: #6200ea;
+  border-radius: 2px;
+  transition: 0.3s;
+}
+
+@media (max-width: 800px) {
+  .navbar {
+    padding: 0.75rem 1rem;
+  }
+  .navbar-links {
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .navbar {
+    flex-wrap: wrap;
+    padding: 0.75rem 1rem;
+  }
+  .nav_icon {
+    display: flex;
+    margin-left: auto;
+  }
+  .nav_links {
+    flex-direction: column;
+    width: 100%;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: #fff;
+    box-shadow: 0 4px 16px rgba(98,0,234,0.08);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s;
+    z-index: 10;
+  }
+  .nav_links li {
+    text-align: left;
+    margin: 0.5rem 0;
+  }
+  .nav_toggle:checked ~ .nav_links {
+    max-height: 300px;
+    padding-bottom: 0.5rem;
+  }
+}
+
   header {
     background: #6200ea;
     color: white;
