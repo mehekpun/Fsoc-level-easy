@@ -30,6 +30,7 @@ html{
   font-size: 1.4rem;
   letter-spacing: 1px;
   cursor:pointer;
+  transition: color 0.3s ease-in-out;
 }
 
 .mysite:hover{
@@ -48,7 +49,7 @@ html{
   color: #333;
   padding: 0.5rem 1rem;
   border-radius: 24px;
-  transition: background 0.2s, color 0.2s;
+  transition: background 0.3s ease-in-out, color 0.3s ease-in-out;
 }
 
 .nav_links li a:hover,
@@ -163,7 +164,7 @@ html{
   border-radius: 50px;
   box-shadow: 0 2px 8px rgba(3, 218, 198, 0.15);
   cursor: pointer;
-  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+  transition: background 0.3s ease-in-out, box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
 
 .btn:hover,
@@ -204,7 +205,7 @@ html{
   width: 300px;
   height: 200px;
   background-color: rgb(255, 255, 255);
-  transition: all 0.05s ease-in;
+  transition: all 0.25s ease-in-out;
   margin: 5px 0;
 }
 
@@ -214,6 +215,7 @@ html{
 
 .modalBox:hover{
   scale: 1.01;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
 
 }
 .modalBox hr{
@@ -240,6 +242,7 @@ html{
 .modalBox p a{
   color: rgb(211, 84, 84);
   text-decoration: none;
+  transition: color 0.3s ease-in-out;
 }
 
 .modalBox p a:hover{
@@ -258,6 +261,8 @@ html{
   footer a{
     color: rgba(220, 219, 219, 0.595);
     text-decoration: none;
+    transition: color 0.3s ease-in-out
+  
   }
 
   footer a:hover{
@@ -409,7 +414,7 @@ h3 {
 .nav_links a {
   text-decoration: none;
   font-weight: 600;
-  transition: color 0.3s;
+  transition: color 0.3s ease-in-out;
 }
 
 .nav_links a:hover {
@@ -455,7 +460,7 @@ section h2 {
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: background 0.3s ease-in-out, box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
 
 .btn:hover {
@@ -493,7 +498,7 @@ footer {
 .footerMiddle a {
   text-decoration: none;
   color: #ecf0f1;
-  transition: color 0.3s;
+  transition: color 0.3s ease-in-out;
 }
 
 .footerMiddle a:hover {
@@ -527,6 +532,7 @@ footer {
     color:#222;
     padding: 0.5rem 1rem;
     border-radius: 8px;
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
 }
 
 .sliding-menu {
@@ -557,7 +563,7 @@ footer {
     font-weight: 600;
     padding: 0.5rem 1rem;
     display: block;
-    transition: background-color 0.2s;
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out, border-radius 0.3s ease-in-out;
 }
 
 .sliding-menu a:hover {
@@ -654,3 +660,35 @@ footer {
         font-size: 1rem;
     }
 }
+.card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  margin: 1rem;
+  overflow: hidden; 
+  cursor: pointer;
+  transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out; 
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(98, 0, 234, 0.15);
+}
+
+.card img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 4px;
+  transition: transform 0.4s ease-out;
+}
+
+.card:hover img {
+  transform: scale(1.05);
+}
+
+
+
+
+
