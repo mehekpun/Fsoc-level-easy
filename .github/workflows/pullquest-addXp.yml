@@ -6,12 +6,12 @@ on:
 
 jobs:
   handle-bonus-xp:
+    # Run on both issue and PR comments
     runs-on: ubuntu-latest
     permissions:
       contents: read
       pull-requests: read
       issues: read
-      issues: write
     env:
       BACKEND_URL: https://pullquestgithubbackend-1.onrender.com
     
@@ -138,7 +138,6 @@ jobs:
     
     - name: Build payload ➜ POST to backend
       if: steps.check-comment.outputs.trigger_action == 'true'
-      id: api_call
       run: |
         echo "🔧 Building API payload..."
         
@@ -160,14 +159,14 @@ jobs:
           --arg repo          "${{ github.event.repository.name }}" \
           --arg requester     "$REQUESTER" \
           --arg targetUser    "$TARGET_USERNAME" \
-          --arg isPullRequest "$IS_PR" \
+          --arg isPR          "$IS_PR" \
           --argjson issueNumber  "$ISSUE_NUMBER" \
           --argjson xpAmount  "$XP_AMOUNT" \
           '{
             owner: $owner,
             repo: $repo, 
             issueNumber: $issueNumber,
-            isPullRequest: ($isPullRequest == "true"),
+            isPullRequest: ($isPR == "true"),
             requester: $requester,
             targetUser: $targetUser,
             xpAmount: $xpAmount
