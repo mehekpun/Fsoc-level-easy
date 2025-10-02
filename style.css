@@ -276,3 +276,170 @@ color: white;
   }
 
 }
+
+/* Google Fonts Import (alternative if not using HTML link) */
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+Pro:wght@300;400;600;700&display=swap");
+
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Base Typography */
+body, .navbar a, .btn, p, li {
+  font-family: "Source Sans Pro", Arial, sans-serif;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Playfair Display", serif;
+  color: #2c3e50;
+  line-height: 1.2;
+  margin-bottom: 0.75rem;
+}
+
+h1 {
+  font-size: 3rem;
+  font-weight: 900;
+}
+
+h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+h3 {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8f9fa;
+  padding: 1rem 2rem;
+}
+
+.mysite {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+/* Nav Links */
+.nav_links {
+  list-style: none;
+  display: flex;
+  gap: 1.5rem;
+}
+
+.nav_links a {
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s;
+}
+
+.nav_links a:hover {
+  color: #007bff;
+}
+
+/* Header */
+header {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+}
+
+header p {
+  font-size: 1.25rem;
+  font-weight: 300;
+  margin-top: 1rem;
+}
+
+/* Main Content */
+main {
+  padding: 2rem;
+}
+
+section h2 {
+  margin-bottom: 1.5rem;
+}
+
+/* Button */
+.btn_container {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.btn {
+  font-family: "Source Sans Pro", sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn:hover {
+  background: #0056b3;
+}
+
+/* Footer */
+footer {
+  background: #2c3e50;
+  color: #ecf0f1;
+  text-align: center;
+  padding: 2rem;
+  font-size: 0.9rem;
+}
+
+.footerMiddle {
+  display: flex;
+  justify-content: space-around;
+  margin: 1.5rem 0;
+}
+
+.footerMiddle p {
+  font-weight: 600;
+}
+
+.footerMiddle ul {
+  list-style: none;
+  margin-top: 0.5rem;
+}
+
+.footerMiddle li {
+  margin-bottom: 0.5rem;
+}
+
+.footerMiddle a {
+  text-decoration: none;
+  color: #ecf0f1;
+  transition: color 0.3s;
+}
+
+.footerMiddle a:hover {
+  color: #f39c12;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .footerMiddle {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
