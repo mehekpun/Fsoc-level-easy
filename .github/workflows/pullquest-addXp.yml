@@ -16,46 +16,144 @@ jobs:
       BACKEND_URL: https://pullquestgithubbackend-1.onrender.com
     
     steps:
+    - name: 🔍 Debug - Show all event data
+      run: |
+        echo "================================================"
+        echo "🔍 FULL EVENT CONTEXT DEBUG"
+        echo "================================================"
+        echo "Event name: ${{ github.event_name }}"
+        echo "Action: ${{ github.event.action }}"
+        echo "Issue/PR number: ${{ github.event.issue.number }}"
+        echo "Is Pull Request: ${{ github.event.issue.pull_request != null }}"
+        echo "Comment ID: ${{ github.event.comment.id }}"
+        echo "Comment author: ${{ github.event.comment.user.login }}"
+        echo "Repository: ${{ github.event.repository.full_name }}"
+        echo ""
+        echo "📝 RAW COMMENT BODY:"
+        echo "---START---"
+        echo '${{ github.event.comment.body }}'
+        echo "---END---"
+        echo ""
+        echo "📏 Comment length: ${#comment_body}"
+        echo "================================================"
+    
     - name: Check if comment mentions @pullquestai and adds XP
       id: check-comment
       run: |
-        comment_body="${{ github.event.comment.body }}"
-        if [[ "$comment_body" == *"@pullquestai add"* ]] && [[ "$comment_body" == *"xp to @"* ]]; then
+        # Store comment in variable with proper quoting
+        comment_body='${{ github.event.comment.body }}'
+        
+        echo "🔍 Starting comment analysis..."
+        echo "Comment content: [$comment_body]"
+        echo ""
+        
+        # Test individual conditions
+        echo "🧪 Testing pattern matching..."
+        
+        if echo "$comment_body" | grep -i "@pullquestai"; then
+          echo "✅ Found '@pullquestai' in comment"
+        else
+          echo "❌ Did NOT find '@pullquestai' in comment"
+        fi
+        
+        if echo "$comment_body" | grep -i "add"; then
+          echo "✅ Found 'add' in comment"
+        else
+          echo "❌ Did NOT find 'add' in comment"
+        fi
+        
+        if echo "$comment_body" | grep -i "xp"; then
+          echo "✅ Found 'xp' in comment"
+        else
+          echo "❌ Did NOT find 'xp' in comment"
+        fi
+        
+        if echo "$comment_body" | grep -i "to @"; then
+          echo "✅ Found 'to @' in comment"
+        else
+          echo "❌ Did NOT find 'to @' in comment"
+        fi
+        
+        echo ""
+        echo "🔍 Attempting to extract XP amount..."
+        xp_test=$(echo "$comment_body" | grep -oP '@pullquestai add \K\d+(?=\s*xp)' | head -1)
+        echo "Extracted XP: [$xp_test]"
+        
+        echo ""
+        echo "🔍 Attempting to extract username..."
+        user_test=$(echo "$comment_body" | grep -oP 'xp to @\K[a-zA-Z0-9_-]+' | head -1)
+        echo "Extracted username: [$user_test]"
+        
+        echo ""
+        echo "🎯 FINAL DECISION:"
+        
+        # Main condition check
+        if echo "$comment_body" | grep -q "@pullquestai add" && echo "$comment_body" | grep -q "xp to @"; then
           echo "trigger_action=true" >> $GITHUB_OUTPUT
-          echo "✅ Bonus XP request detected!"
+          echo "✅ Bonus XP request DETECTED!"
           
-          xp_amount=$(echo "$comment_body" | grep -oP '@pullquestai add \K\d+(?= *xp)' | head -1)
+          # Extract XP amount
+          xp_amount=$(echo "$comment_body" | grep -oP '@pullquestai add \K\d+(?=\s*xp)' | head -1)
           echo "xp_amount=$xp_amount" >> $GITHUB_OUTPUT
           
+          # Extract username
           username=$(echo "$comment_body" | grep -oP 'xp to @\K[a-zA-Z0-9_-]+' | head -1)
           echo "username=$username" >> $GITHUB_OUTPUT
           
-          echo "🔍 XP Amount: $xp_amount"
-          echo "🔍 Username: $username"
+          echo ""
+          echo "📊 EXTRACTED VALUES:"
+          echo "  XP Amount: $xp_amount"
+          echo "  Username: $username"
+          
+          # Validate extractions
+          if [ -z "$xp_amount" ]; then
+            echo "⚠️ WARNING: XP amount is empty!"
+          fi
+          if [ -z "$username" ]; then
+            echo "⚠️ WARNING: Username is empty!"
+          fi
         else
           echo "trigger_action=false" >> $GITHUB_OUTPUT
-          echo "ℹ️  Not a bonus XP request, skipping..."
+          echo "❌ Not a bonus XP request, skipping..."
+          echo ""
+          echo "💡 Expected format: '@pullquestai add [number] xp to @[username]'"
+          echo "💡 Example: '@pullquestai add 30 xp to @aryan123'"
         fi
+        
+        echo "================================================"
     
     - name: Debug – print extracted info
       if: steps.check-comment.outputs.trigger_action == 'true'
       run: |
+        echo "================================================"
+        echo "✅ PROCEEDING WITH XP AWARD"
+        echo "================================================"
         echo "🔍 Issue/PR #  : ${{ github.event.issue.number }}"
         echo "🔍 Is PR?      : ${{ github.event.issue.pull_request != null }}"
         echo "🔍 Requester   : ${{ github.event.comment.user.login }}"
         echo "🔍 XP Amount   : ${{ steps.check-comment.outputs.xp_amount }}"
         echo "🔍 Target User : ${{ steps.check-comment.outputs.username }}"
         echo "🔍 Repo        : ${{ github.event.repository.full_name }}"
+        echo "================================================"
     
     - name: Build payload ➜ POST to backend
       if: steps.check-comment.outputs.trigger_action == 'true'
       id: api_call
       run: |
+        echo "🔧 Building API payload..."
+        
         ISSUE_NUMBER=${{ github.event.issue.number }}
         REQUESTER="${{ github.event.comment.user.login }}"
         XP_AMOUNT=${{ steps.check-comment.outputs.xp_amount }}
         TARGET_USERNAME="${{ steps.check-comment.outputs.username }}"
         IS_PR="${{ github.event.issue.pull_request != null }}"
+        
+        echo "Raw values:"
+        echo "  ISSUE_NUMBER: $ISSUE_NUMBER"
+        echo "  REQUESTER: $REQUESTER"
+        echo "  XP_AMOUNT: $XP_AMOUNT"
+        echo "  TARGET_USERNAME: $TARGET_USERNAME"
+        echo "  IS_PR: $IS_PR"
         
         payload=$(jq -n \
           --arg owner         "${{ github.event.repository.owner.login }}" \
@@ -75,15 +173,22 @@ jobs:
             xpAmount: $xpAmount
           }')
         
-        echo "📦 Payload:"
-        echo "$payload"
+        echo ""
+        echo "📦 Final Payload:"
+        echo "$payload" | jq '.'
+        echo ""
         
         max_retries=3
         retry_count=0
         success=false
         
         while [ $retry_count -lt $max_retries ] && [ "$success" = false ]; do
-          echo "🔄 Attempt $((retry_count + 1)) of $max_retries..."
+          echo "================================================"
+          echo "🔄 API Call Attempt $((retry_count + 1)) of $max_retries"
+          echo "================================================"
+          echo "Endpoint: $BACKEND_URL/api/hactoberfest/ContributorXp"
+          echo "Method: POST"
+          echo ""
           
           http_code=$(curl --silent --output /tmp/response.txt --write-out "%{http_code}" \
             --max-time 90 \
@@ -91,9 +196,10 @@ jobs:
             -H "Content-Type: application/json" \
             --data-raw "$payload")
           
-          echo "HTTP Status: $http_code"
-          echo "Response:"
+          echo "📡 HTTP Status: $http_code"
+          echo "📄 Response Body:"
           cat /tmp/response.txt
+          echo ""
           
           if [ "$http_code" = "201" ] || [ "$http_code" = "200" ]; then
             echo "✅ Success! HTTP $http_code"
@@ -155,6 +261,19 @@ jobs:
             content: 'rocket'
           });
     
-    - name: Done
-      if: steps.check-comment.outputs.trigger_action == 'true'
-      run: echo "✅ PullQuestAI backend notified for bonus XP award"
+    - name: ✅ Workflow Complete
+      if: always()
+      run: |
+        echo "================================================"
+        echo "🏁 WORKFLOW EXECUTION COMPLETE"
+        echo "================================================"
+        if [ "${{ steps.check-comment.outputs.trigger_action }}" = "true" ]; then
+          if [ "${{ steps.api_call.outputs.success }}" = "true" ]; then
+            echo "✅ PullQuestAI backend notified for bonus XP award"
+          else
+            echo "❌ Failed to notify backend"
+          fi
+        else
+          echo "ℹ️  Comment did not trigger XP award action"
+        fi
+        echo "================================================"
