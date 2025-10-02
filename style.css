@@ -1,3 +1,7 @@
+html {
+  scroll-behavior: smooth;
+}
+
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -6,7 +10,9 @@ body {
     background: #f5f7fa;
     color: #333;
   }
-
+html{
+  scroll-behavior: smooth;
+}
 .navbar {
   display: flex;
   align-items: center;
@@ -182,6 +188,61 @@ body {
   }
 }
 
+.modalBox{
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  position: absolute;
+  left: 600px;
+  bottom:250px;
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 5px;
+  border-radius: 20px;
+  width: 300px;
+  height: 200px;
+  background-color: rgb(255, 255, 255);
+  transition: all 0.05s ease-in;
+  margin: 5px 0;
+}
+
+.modalBox:target{
+  display: flex;
+}
+
+.modalBox:hover{
+  scale: 1.01;
+
+}
+.modalBox hr{
+  color: white;
+}
+
+.modalBox .modalTitle{
+  padding: 2px;
+  font-family:Playfair Display;
+  font-size: 20px;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.759);
+
+}
+
+
+.modalBox .modalContent{
+  font-size: 16px;
+  padding: 5px;
+}
+
+
+
+.modalBox p a{
+  color: rgb(211, 84, 84);
+  text-decoration: none;
+}
+
+.modalBox p a:hover{
+  color: rgb(255, 0, 0);
+}
+
   footer {
     
     background: #222;
@@ -268,6 +329,10 @@ color: white;
 
   @media screen and (max-width: 600px) {
 
+  .modalBox{
+    left: 50px;
+    bottom: 50px;
+  }
   footer {
     margin-bottom: 50px;
   }
