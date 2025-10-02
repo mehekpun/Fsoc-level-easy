@@ -668,7 +668,7 @@ footer {
   margin: 1rem;
   overflow: hidden; 
   cursor: pointer;
-  transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out; 
+  transition: box-shadow 0.31s ease-in-out, transform 0.31s ease-in-out; 
 }
 
 .card:hover {
