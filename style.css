@@ -6,7 +6,115 @@ body {
     background: #f5f7fa;
     color: #333;
   }
-  
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  padding: 0.75rem 2rem;
+  box-shadow: 0 2px 8px rgba(98,0,234,0.07);
+  position: relative;
+  font-size: 1.1rem;
+}
+
+.mysite {
+  font-weight: bold;
+  color: #6200ea;
+  font-size: 1.4rem;
+  letter-spacing: 1px;
+  cursor:pointer;
+}
+
+.mysite:hover{
+  color:#d213c2;
+}
+.nav_links {
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
+}
+
+.nav_links li a {
+  text-decoration: none;
+  color: #333;
+  padding: 0.5rem 1rem;
+  border-radius: 24px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.nav_links li a:hover,
+.nav_links li a:focus {
+  background: #6200ea;
+  color: #fff;
+}
+
+.nav_toggle {
+  display: none;
+}
+
+.nav_icon {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  width: 32px;
+  height: 28px;
+  justify-content: center;
+  gap: 5px;
+}
+
+.nav_icon span {
+  display: block;
+  height: 4px;
+  width: 100%;
+  background: #6200ea;
+  border-radius: 2px;
+  transition: 0.3s;
+}
+
+@media (max-width: 800px) {
+  .navbar {
+    padding: 0.75rem 1rem;
+  }
+  .navbar-links {
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .navbar {
+    flex-wrap: wrap;
+    padding: 0.75rem 1rem;
+  }
+  .nav_icon {
+    display: flex;
+    margin-left: auto;
+  }
+  .nav_links {
+    flex-direction: column;
+    width: 100%;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: #fff;
+    box-shadow: 0 4px 16px rgba(98,0,234,0.08);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s;
+    z-index: 10;
+  }
+  .nav_links li {
+    text-align: left;
+    margin: 0.5rem 0;
+  }
+  .nav_toggle:checked ~ .nav_links {
+    max-height: 300px;
+    padding-bottom: 0.5rem;
+  }
+}
+
   header {
     background: #6200ea;
     color: white;
@@ -27,11 +135,144 @@ body {
     border: 1px solid #ccc;
     border-radius: 8px;
   }
-  
+
+  .btn_container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  min-height: 200px;
+}
+
+.btn {
+  padding: 0.75rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+  background: #03dac6;
+  border: none;
+  border-radius: 50px;
+  box-shadow: 0 2px 8px rgba(3, 218, 198, 0.15);
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+.btn:hover,
+.btn:focus {
+  background: #018786;
+  box-shadow: 0 6px 24px rgba(3, 218, 198, 0.25);
+  transform: translateY(-2px) scale(1.04);
+  outline: none;
+}
+
+.btn:active {
+  background: #02675b;
+  box-shadow: 0 1px 4px rgba(3, 218, 198, 0.18);
+  transform: translateY(1px) scale(0.98);
+}
+
+@media (max-width: 600px) {
+  .btn {
+    width: 90%;
+    font-size: 1rem;
+    padding: 0.75rem 0;
+  }
+  .btn_container {
+    min-height: 120px;
+  }
+}
+
   footer {
+    
     background: #222;
     color: white;
     padding: 1rem;
     margin-top: 2rem;
+    
   }
   
+  footer a{
+    color: rgba(220, 219, 219, 0.595);
+    text-decoration: none;
+  }
+
+  footer a:hover{
+color: white;
+  }
+
+  .linkToFest{
+    margin-left:12px ;
+    font-size: 18px;
+    color: #ccc;
+    text-align: left; 
+  }
+
+  .linkToFest span{
+    font-size: 20px;
+  }
+  
+  .linkToFest span a{
+    color: #b0a0c8e9;
+  }
+
+  .linkToFest span a:hover{
+    color:#6550e8f4;
+  }
+
+  .footerMiddle{
+    display: flex;
+  }
+
+  .linkToSocials{
+    width: 300px;
+    text-align: left;
+
+  }
+
+  .linkToSocials > p{
+    
+    padding-left: 12px;
+    color: #ccc;
+  }
+
+  .linkToSocials ul{
+    margin: 8px 0;
+    padding-left: 10px;
+    list-style-type: none;
+  }
+
+  .linkToSocials ul li{
+    padding: 2px;
+  }
+
+  .contactUs{
+    width: 300px;
+    text-align: left;
+  }
+
+  .contactUs > p{
+    padding-left: 12px;
+    color: #ccc;
+  }
+
+  .contactUs ul{
+    padding-left: 10px;
+    margin: 8px 0;
+    list-style-type: none;
+  }
+
+  .contactUs ul li{
+    padding:2px;
+    color: rgba(220, 219, 219, 0.595);
+  }
+
+  @media screen and (max-width: 600px) {
+
+  footer {
+    margin-bottom: 50px;
+  }
+  .footerMiddle{
+    flex-direction: column;
+  }
+
+}
