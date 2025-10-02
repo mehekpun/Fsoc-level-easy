@@ -284,6 +284,7 @@ html{
   .linkToSocials{
     width: 300px;
     text-align: left;
+    
 
   }
 
@@ -306,6 +307,7 @@ html{
   .contactUs{
     width: 300px;
     text-align: left;
+    margin-right: 1rem;
     
   }
 
