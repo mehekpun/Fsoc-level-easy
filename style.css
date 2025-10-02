@@ -254,14 +254,15 @@ html{
   }
 
   footer a:hover{
-color: white;
+    color: white;
   }
 
   .linkToFest{
     margin-left:12px ;
     font-size: 18px;
     color: #ccc;
-    text-align: left; 
+    text-align: left;
+    
   }
 
   .linkToFest span{
@@ -305,6 +306,7 @@ color: white;
   .contactUs{
     width: 300px;
     text-align: left;
+    
   }
 
   .contactUs > p{
@@ -466,7 +468,7 @@ footer {
 
 .footerMiddle {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   margin: 1.5rem 0;
 }
 
