@@ -443,3 +443,88 @@ footer {
     gap: 1rem;
   }
 }
+/* --- Sliding Menu --- */
+.menu-toggle {
+    display: none;
+}
+
+.menu-btn {
+    font-size: 2rem;
+    cursor: pointer;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1001;
+    background-color:cadetblue;
+    color:#222;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+}
+
+.sliding-menu {
+    position: fixed;
+    top: 0;
+    left: -250px; /* hidden by default */
+    width: 250px;
+    height: 100%;
+    background-color:blanchedalmond;
+    box-shadow: 2px 0 10px var(--shadow-color);
+    transition: left 0.3s ease;
+    padding-top: 4rem;
+    z-index: 1000;
+}
+
+.sliding-menu ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sliding-menu li {
+    margin: 1rem 0;
+}
+
+.sliding-menu a {
+    text-decoration: none;
+    color: #018786;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    display: block;
+    transition: background-color 0.2s;
+}
+
+.sliding-menu a:hover {
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 5px;
+}
+
+/* Toggle menu */
+.menu-toggle:checked ~ .sliding-menu {
+    left: 0;
+}
+
+/* Push content when menu opens */
+.menu-toggle:checked ~ .content {
+    margin-left: 250px;
+    transition: margin-left 0.3s ease;
+}
+
+/* Content area */
+.content {
+    padding: 2rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .menu-btn {
+        font-size: 1.5rem;
+        padding: 0.3rem 0.8rem;
+    }
+    .sliding-menu {
+        width: 200px;
+        left: -200px;
+    }
+    .menu-toggle:checked ~ .content {
+        margin-left: 200px;
+    }
+}
