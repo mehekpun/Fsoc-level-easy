@@ -79,6 +79,9 @@ html{
   border-radius: 2px;
   transition: 0.3s;
 }
+.price-table{
+  border-top: 50px;
+}
 
 @media (max-width: 800px) {
   .navbar {
