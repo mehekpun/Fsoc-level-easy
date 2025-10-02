@@ -6,12 +6,12 @@ on:
 
 jobs:
   handle-bonus-xp:
-    # Run on both issue and PR comments
     runs-on: ubuntu-latest
     permissions:
       contents: read
       pull-requests: read
       issues: read
+      issues: write  # Add this for posting comments
     env:
       BACKEND_URL: https://pullquestgithubbackend-1.onrender.com
     
@@ -25,11 +25,11 @@ jobs:
           echo "✅ Bonus XP request detected!"
           
           # Extract XP amount using regex
-          xp_amount=$(echo "$comment_body" | grep -oP '@pullquestai add \K\d+(?= xp)')
+          xp_amount=$(echo "$comment_body" | grep -oP '@pullquestai add \K\d+(?= *xp)' | head -1)
           echo "xp_amount=$xp_amount" >> $GITHUB_OUTPUT
           
           # Extract username using regex  
-          username=$(echo "$comment_body" | grep -oP 'xp to @\K[a-zA-Z0-9_-]+')
+          username=$(echo "$comment_body" | grep -oP 'xp to @\K[a-zA-Z0-9_-]+' | head -1)
           echo "username=$username" >> $GITHUB_OUTPUT
           
           echo "🔍 XP Amount: $xp_amount"
@@ -51,6 +51,7 @@ jobs:
     
     - name: Build payload ➜ POST to backend
       if: steps.check-comment.outputs.trigger_action == 'true'
+      id: api_call
       run: |
         ISSUE_NUMBER=${{ github.event.issue.number }}
         REQUESTER="${{ github.event.comment.user.login }}"
@@ -64,14 +65,14 @@ jobs:
           --arg repo          "${{ github.event.repository.name }}" \
           --arg requester     "$REQUESTER" \
           --arg targetUser    "$TARGET_USERNAME" \
-          --arg isPR          "$IS_PR" \
+          --arg isPullRequest "$IS_PR" \
           --argjson issueNumber  "$ISSUE_NUMBER" \
           --argjson xpAmount  "$XP_AMOUNT" \
           '{
             owner: $owner,
             repo: $repo, 
             issueNumber: $issueNumber,
-            isPullRequest: ($isPR == "true"),
+            isPullRequest: ($isPullRequest == "true"),
             requester: $requester,
             targetUser: $targetUser,
             xpAmount: $xpAmount
@@ -80,13 +81,83 @@ jobs:
         echo "📦 Payload:"
         echo "$payload"
         
-        response=$(curl --fail --show-error --silent \
-          -X POST "$BACKEND_URL/api/hactoberfest/ContributorXp" \
-          -H "Content-Type: application/json" \
-          --data-raw "$payload" \
-          -w '\nHTTP %{http_code}\n' )
+        # Retry logic for Render cold starts
+        max_retries=3
+        retry_count=0
+        success=false
         
-        echo "🔍 Response: $response"
+        while [ $retry_count -lt $max_retries ] && [ "$success" = false ]; do
+          echo "🔄 Attempt $((retry_count + 1)) of $max_retries..."
+          
+          http_code=$(curl --silent --output /tmp/response.txt --write-out "%{http_code}" \
+            --max-time 90 \
+            -X POST "$BACKEND_URL/api/hactoberfest/ContributorXp" \
+            -H "Content-Type: application/json" \
+            --data-raw "$payload")
+          
+          echo "HTTP Status: $http_code"
+          echo "Response:"
+          cat /tmp/response.txt
+          
+          if [ "$http_code" = "201" ] || [ "$http_code" = "200" ]; then
+            echo "✅ Success! HTTP $http_code"
+            success=true
+            echo "success=true" >> $GITHUB_OUTPUT
+          elif [ "$http_code" = "403" ]; then
+            echo "❌ Unauthorized - requester not in allowed list"
+            echo "error=unauthorized" >> $GITHUB_OUTPUT
+            exit 1
+          else
+            echo "⚠️ Failed with HTTP $http_code"
+            retry_count=$((retry_count + 1))
+            
+            if [ $retry_count -lt $max_retries ]; then
+              echo "⏳ Waiting 45 seconds for service to wake up..."
+              sleep 45
+            fi
+          fi
+        done
+        
+        if [ "$success" = false ]; then
+          echo "❌ All retries failed after $max_retries attempts"
+          echo "error=timeout" >> $GITHUB_OUTPUT
+          exit 1
+        fi
+    
+    - name: Post error comment if failed
+      if: failure() && steps.check-comment.outputs.trigger_action == 'true'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const errorType = '${{ steps.api_call.outputs.error }}';
+          let message = '❌ **Failed to award XP**\n\n';
+          
+          if (errorType === 'unauthorized') {
+            message += 'You do not have permission to award XP. Only organization owners can use this command.';
+          } else if (errorType === 'timeout') {
+            message += 'The backend service is not responding. Please try again in a few minutes.';
+          } else {
+            message += 'An unexpected error occurred. Please check the workflow logs.';
+          }
+          
+          github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+            body: message
+          });
+    
+    - name: React to comment
+      if: steps.check-comment.outputs.trigger_action == 'true' && steps.api_call.outputs.success == 'true'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          github.rest.reactions.createForIssueComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            comment_id: context.payload.comment.id,
+            content: 'rocket'
+          });
     
     - name: Done
       if: steps.check-comment.outputs.trigger_action == 'true'
