@@ -113,3 +113,22 @@ h2{
     border-width: 4px;
   }
 }
+
+.glow-btn {
+  padding: 12px 24px;
+  font-size: 16px;
+  color: #a84141;
+  background-color: #f6f603;  
+  border-radius: 8px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.glow-btn:hover {
+  box-shadow: 0 0 10px #d5b40b,
+              0 0 20px #ec5e06,
+              0 0 30px #e50808;
+  transform: translateY(-2px);
+}
+
